@@ -52,7 +52,7 @@
   };
 
   xspace = 50;
-  window.ontouchmove = (event) => {
+  window.addEventListener('touchmove', (event) => {
     const t = event.touches[0];
 
     let xMove = t.clientX - beginPosition.x;
@@ -80,7 +80,8 @@ xMove += xspace
         )
       )
     );
-  };
+    event.preventDefault()
+  },{passive:false})
 
   let inr = null;
 
