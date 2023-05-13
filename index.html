@@ -1,10 +1,65 @@
 <!DOCTYPE html>
 <html>
-    <body>
-        <script>
-            document.body.onmousemove = ()=>{
-                console.log('move')
-            }
-        </script>
-    </body>
+  <head>
+    <title></title>
+  </head>
+  <body>
+    遥控程序
+  </body>
+  <script>
+    const ws = new WebSocket("ws://pi:8765");
+    ws.binaryType = "arraybuffer";
+    ws.onopen = () => {};
+
+    ws.onclose = ()=>{
+      document.body.innerText = '连接已断开'
+    }
+
+    ws.onerror = ()=>{
+      document.body.innerText = '连接错误'
+    }
+
+    function sendData() {
+      if (ws.readyState == ws.OPEN) {
+        const int8Arr = new Uint8Array([steer, speed]);
+        ws.send(int8Arr);
+        document.body.innerText = "steer:" + steer + " speed:" + speed;
+        inr = setTimeout(sendData, 100);
+      }
+    }
+
+    let beginPosition = { x: 0, y: 0 };
+    let steer = 0;
+    let speed = 0;
+    window.ontouchstart = (event) => {
+      const t = event.touches[0];
+      beginPosition.x = t.clientX;
+      beginPosition.y = t.clientY;
+      steer = 0;
+      speed = 0;
+      sendData();
+    };
+
+    window.ontouchmove = (event) => {
+      const t = event.touches[0];
+      steer = Math.max(-127,Math.min(
+        127,
+        Math.trunc(
+          ((t.clientX - beginPosition.x) / (window.innerWidth/4)) * 127
+        )
+      ))
+      speed = Math.max(-127, Math.min(
+        127,
+        Math.trunc(
+          ((beginPosition.y - t.clientY) / (window.innerHeight/6)) * 127
+        )
+      ))
+    };
+
+    let inr = null;
+
+    window.ontouchend = (event) => {
+      clearTimeout(inr);
+    };
+  </script>
 </html>
