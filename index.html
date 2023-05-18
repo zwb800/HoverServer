@@ -17,7 +17,7 @@
 </style>
 <script>
   const msg = document.getElementById('message')
-  const ws = new WebSocket("ws://pi:8765");
+  const ws = new WebSocket("ws://"+location.hostname+":8765");
   ws.binaryType = "arraybuffer";
   ws.onopen = () => {};
 
